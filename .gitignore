@@ -1,0 +1,11 @@
+# Ignorar entornos virtuales y caches de Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+env/
+
+# Ignorar la carpeta de pesos de 10.1 GB (se aloja en Hugging Face) y GGUF
+cache_holocell_v8/
+*.gguf
+*.tmp

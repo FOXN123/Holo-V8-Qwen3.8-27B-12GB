@@ -1,0 +1,9 @@
+=== HOLO-V8 LABORATORY ENVIRONMENT SPECS ===
+OS / Kernel : Linux-6.8.0-147-generic-x86_64-with-glibc2.39
+Python      : 3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]
+PyTorch     : 2.14.1+cu130 (CUDA 13.0)
+Triton      : 3.8.0
+GPU Specs   :
+name, driver_version, memory.total [MiB], compute_cap
+NVIDIA GeForce RTX 3060, 580.178.04, 12288 MiB, 8.6
+
