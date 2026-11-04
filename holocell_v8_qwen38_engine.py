@@ -568,8 +568,10 @@ class GGUFNativeTokenizer:
             vocab_pt = os.path.join(CACHE_DIR, "tokenizer_vocab.pt")
         if os.path.exists(vocab_pt):
             print(f"[*] Loading instant native vocabulary from {vocab_pt}...")
-            vd = torch.load(vocab_pt, map_location="cpu", weights_only=False)
+            vd = torch.load(vocab_pt, map_location="cpu", weights_only=True)
             self.__dict__.update(vd)
+            if isinstance(getattr(self, "pat", None), str):
+                self.pat = re.compile(self.pat)
             print("[OK] Native tokenizer ready (Loaded in 0.1s without requiring GGUF file)")
             return
         if reader is None:
