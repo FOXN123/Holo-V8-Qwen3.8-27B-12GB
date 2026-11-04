@@ -565,13 +565,37 @@ def bytes_to_unicode():
 class GGUFNativeTokenizer:
     def __init__(self, reader=None, vocab_pt=None):
         if vocab_pt is None:
-            vocab_pt = os.path.join(CACHE_DIR, "tokenizer_vocab.pt")
-        if os.path.exists(vocab_pt):
-            print(f"[*] Loading instant native vocabulary from {vocab_pt}...")
-            vd = torch.load(vocab_pt, map_location="cpu", weights_only=True)
-            self.__dict__.update(vd)
-            if isinstance(getattr(self, "pat", None), str):
-                self.pat = re.compile(self.pat)
+            vocab_json = os.path.join(CACHE_DIR, "tokenizer_vocab.json")
+        vocab_pt = os.path.join(CACHE_DIR, "tokenizer_vocab.pt")
+        target_path = vocab_json if os.path.exists(vocab_json) else vocab_pt
+        
+        if os.path.exists(target_path):
+            print(f"[*] Loading instant native vocabulary from {target_path}...")
+            if target_path.endswith(".json"):
+                import json
+                with open(target_path, "r", encoding="utf-8") as jf:
+                    vd = json.load(jf)
+                # Reconstruir bpe_ranks desde lista de strings
+                self.id_to_token = vd["id_to_token"]
+                self.token_to_id = vd["token_to_id"]
+                self.bpe_ranks = {}
+                for item in vd["bpe_ranks"]:
+                    parts = item.split(" ")
+                    if len(parts) == 2:
+                        self.bpe_ranks[(parts[0], parts[1])] = len(self.bpe_ranks)
+                self.byte_encoder = {int(k): v for k, v in vd["byte_encoder"].items()}
+                self.byte_decoder = vd["byte_decoder"]
+                self.eos_token_id = vd["eos_token_id"]
+                self.im_start_id = vd["im_start_id"]
+                self.im_end_id = vd["im_end_id"]
+                self.think_start_id = vd["think_start_id"]
+                self.think_end_id = vd["think_end_id"]
+                self.pat = re.compile(vd["pat"])
+            else:
+                vd = torch.load(target_path, map_location="cpu", weights_only=True)
+                self.__dict__.update(vd)
+                if isinstance(getattr(self, "pat", None), str):
+                    self.pat = re.compile(self.pat)
             print("[OK] Native tokenizer ready (Loaded in 0.1s without requiring GGUF file)")
             return
         if reader is None:
